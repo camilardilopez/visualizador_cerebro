@@ -3,43 +3,50 @@ import nibabel as nib
 import numpy as np
 import matplotlib.pyplot as plt
 import tempfile
+import os
 
 st.set_page_config(layout="wide")
 st.title("🧠 Visualizador de Cerebro en NIfTI")
 
+# Subida de archivo
 uploaded_file = st.file_uploader("Sube un archivo NIfTI (.nii o .nii.gz)", type=["nii", "gz"])
 
 if uploaded_file is not None:
-    # Guardar archivo temporalmente y cargarlo con nibabel
-    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+    # Guardar archivo con extensión correcta .nii.gz
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".nii.gz") as tmp_file:
         tmp_file.write(uploaded_file.read())
         tmp_file_path = tmp_file.name
 
-    img = nib.load(tmp_file_path)
-    data = img.get_fdata()
-    shape = data.shape
-    st.success(f"Imagen cargada con forma: {shape}")
+    # Cargar el archivo con nibabel
+    try:
+        img = nib.load(tmp_file_path)
+        data = img.get_fdata()
+        shape = data.shape
+        st.success(f"Imagen cargada con forma: {shape}")
 
-    # Sliders para cortes
-    col1, col2, col3 = st.columns(3)
+        # Sliders para cortes
+        col1, col2, col3 = st.columns(3)
 
-    with col1:
-        idx_axial = st.slider("Corte axial", 0, shape[2] - 1, shape[2] // 2)
-        fig, ax = plt.subplots()
-        ax.imshow(np.rot90(data[:, :, idx_axial]), cmap='gray')
-        ax.axis("off")
-        st.pyplot(fig)
+        with col1:
+            idx_axial = st.slider("Corte axial", 0, shape[2] - 1, shape[2] // 2)
+            fig, ax = plt.subplots()
+            ax.imshow(np.rot90(data[:, :, idx_axial]), cmap='gray')
+            ax.axis("off")
+            st.pyplot(fig)
 
-    with col2:
-        idx_coronal = st.slider("Corte coronal", 0, shape[1] - 1, shape[1] // 2)
-        fig, ax = plt.subplots()
-        ax.imshow(np.rot90(data[:, idx_coronal, :]), cmap='gray')
-        ax.axis("off")
-        st.pyplot(fig)
+        with col2:
+            idx_coronal = st.slider("Corte coronal", 0, shape[1] - 1, shape[1] // 2)
+            fig, ax = plt.subplots()
+            ax.imshow(np.rot90(data[:, idx_coronal, :]), cmap='gray')
+            ax.axis("off")
+            st.pyplot(fig)
 
-    with col3:
-        idx_sagital = st.slider("Corte sagital", 0, shape[0] - 1, shape[0] // 2)
-        fig, ax = plt.subplots()
-        ax.imshow(np.rot90(data[idx_sagital, :, :]), cmap='gray')
-        ax.axis("off")
-        st.pyplot(fig)
+        with col3:
+            idx_sagital = st.slider("Corte sagital", 0, shape[0] - 1, shape[0] // 2)
+            fig, ax = plt.subplots()
+            ax.imshow(np.rot90(data[idx_sagital, :, :]), cmap='gray')
+            ax.axis("off")
+            st.pyplot(fig)
+
+    except Exception as e:
+        st.error(f"Error al procesar la imagen: {e}")
