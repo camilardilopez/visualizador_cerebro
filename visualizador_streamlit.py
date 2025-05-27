@@ -2,17 +2,20 @@ import streamlit as st
 import nibabel as nib
 import numpy as np
 import matplotlib.pyplot as plt
-import io
+import tempfile
 
 st.set_page_config(layout="wide")
 st.title("🧠 Visualizador de Cerebro en NIfTI")
 
-# Subida de archivo
 uploaded_file = st.file_uploader("Sube un archivo NIfTI (.nii o .nii.gz)", type=["nii", "gz"])
 
 if uploaded_file is not None:
-    # Leer archivo como NIfTI
-    img = nib.load(uploaded_file)
+    # Guardar archivo temporalmente y cargarlo con nibabel
+    with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+        tmp_file.write(uploaded_file.read())
+        tmp_file_path = tmp_file.name
+
+    img = nib.load(tmp_file_path)
     data = img.get_fdata()
     shape = data.shape
     st.success(f"Imagen cargada con forma: {shape}")
