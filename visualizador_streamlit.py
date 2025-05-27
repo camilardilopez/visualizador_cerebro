@@ -12,7 +12,7 @@ uploaded_file = st.file_uploader("Sube un archivo NIfTI (.nii o .nii.gz)", type=
 
 if uploaded_file is not None:
     # Leer archivo como NIfTI
-    img = nib.load(io.BytesIO(uploaded_file.read()))
+    img = nib.load(uploaded_file)
     data = img.get_fdata()
     shape = data.shape
     st.success(f"Imagen cargada con forma: {shape}")
