@@ -38,4 +38,39 @@ if uploaded_file is not None:
         zoom_factor = 1 / zoom
         center_x, center_y = corte.shape[0] // 2, corte.shape[1] // 2
         size_x, size_y = int(corte.shape[0] * zoom_factor), int(corte.shape[1] * zoom_factor)
-        start_x, end_x = max(center_x - size_
+        start_x, end_x = max(center_x - size_x // 2, 0), min(center_x + size_x // 2, corte.shape[0])
+        start_y, end_y = max(center_y - size_y // 2, 0), min(center_y + size_y // 2, corte.shape[1])
+        corte_zoom = corte[start_x:end_x, start_y:end_y]
+
+        fig, ax = plt.subplots()
+        ax.imshow(np.rot90(corte_zoom), cmap='gray', vmin=vmin, vmax=vmax)
+        ax.set_title(title)
+        ax.axis("off")
+        st.pyplot(fig)
+
+    def get_mm_coords(i, j, k):
+        voxel = np.array([i, j, k, 1])
+        mm = affine @ voxel
+        return f"{mm[0]:.2f} mm, {mm[1]:.2f} mm, {mm[2]:.2f} mm"
+
+    # Layout tipo cuadrante 2x2
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("### 🟥 Axial")
+        corte = data[:, :, idx_axial]
+        mostrar_corte(corte, f"Axial ({idx_axial}) - {get_mm_coords(0, 0, idx_axial)}")
+
+    with col2:
+        st.markdown("### 🟪 Vista 3D (placeholder)")
+        st.info("Aquí podría ir una futura vista 3D con PyVista o Plotly")
+
+    col3, col4 = st.columns(2)
+    with col3:
+        st.markdown("### 🟩 Coronal")
+        corte = data[:, idx_coronal, :]
+        mostrar_corte(corte, f"Coronal ({idx_coronal}) - {get_mm_coords(0, idx_coronal, 0)}")
+
+    with col4:
+        st.markdown("### 🟦 Sagital")
+        corte = data[idx_sagital, :, :]
+        mostrar_corte(corte, f"Sagital ({idx_sagital}) - {get_mm_coords(idx_sagital, 0, 0)}")
