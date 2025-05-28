@@ -21,7 +21,7 @@ if uploaded_file is not None:
 
     st.success(f"Dimensiones del volumen: {shape}")
 
-    # Columnas principales: izquierda (30%) y derecha (70%)
+    # Columnas principales
     col_izq, col_der = st.columns([3, 7])
 
     with col_izq:
@@ -49,30 +49,45 @@ if uploaded_file is not None:
             ax.axis("off")
             st.pyplot(fig, use_container_width=True)
 
-        # Cuadrícula 2x2 dentro de la columna derecha
+        # Cuadrícula 2x2
         c1, c2 = st.columns(2)
         with c1:
-            st.markdown("### 🟥 Axial")
-            axial_labels = [f"{get_mm(0, 0, i)[2]:.2f} mm" for i in range(shape[2])]
-            idx_axial_label = st.select_slider("Corte axial (mm)", options=axial_labels, value=axial_labels[shape[2] // 2], key="axial")
-            idx_axial = axial_labels.index(idx_axial_label)
+            st.markdown('<h5 style="color:#c0392b;">🟥 Axial</h5>', unsafe_allow_html=True)
+            axial_vals = [get_mm(0, 0, i)[2] for i in range(shape[2])]
+            idx_axial = st.slider(
+                "", 0, shape[2] - 1, shape[2] // 2,
+                format_func=lambda i: f"{axial_vals[i]:.2f} mm",
+                key="axial",
+                label_visibility="collapsed"
+            )
+            st.markdown("<div style='margin-top:-20px'></div>", unsafe_allow_html=True)
             mostrar_corte(data[:, :, idx_axial], zoom)
 
         with c2:
-            st.markdown("### 🟪 Vista 3D (placeholder)")
+            st.markdown('<h5 style="color:#8e44ad;">🟪 Vista 3D (placeholder)</h5>', unsafe_allow_html=True)
             st.info("Aquí puede ir una vista 3D futura con PyVista o Plotly.")
 
         c3, c4 = st.columns(2)
         with c3:
-            st.markdown("### 🟩 Coronal")
-            coronal_labels = [f"{get_mm(0, i, 0)[1]:.2f} mm" for i in range(shape[1])]
-            idx_coronal_label = st.select_slider("Corte coronal (mm)", options=coronal_labels, value=coronal_labels[shape[1] // 2], key="coronal")
-            idx_coronal = coronal_labels.index(idx_coronal_label)
+            st.markdown('<h5 style="color:#27ae60;">🟩 Coronal</h5>', unsafe_allow_html=True)
+            coronal_vals = [get_mm(0, i, 0)[1] for i in range(shape[1])]
+            idx_coronal = st.slider(
+                "", 0, shape[1] - 1, shape[1] // 2,
+                format_func=lambda i: f"{coronal_vals[i]:.2f} mm",
+                key="coronal",
+                label_visibility="collapsed"
+            )
+            st.markdown("<div style='margin-top:-20px'></div>", unsafe_allow_html=True)
             mostrar_corte(data[:, idx_coronal, :], zoom)
 
         with c4:
-            st.markdown("### 🟦 Sagital")
-            sagital_labels = [f"{get_mm(i, 0, 0)[0]:.2f} mm" for i in range(shape[0])]
-            idx_sagital_label = st.select_slider("Corte sagital (mm)", options=sagital_labels, value=sagital_labels[shape[0] // 2], key="sagital")
-            idx_sagital = sagital_labels.index(idx_sagital_label)
+            st.markdown('<h5 style="color:#2980b9;">🟦 Sagital</h5>', unsafe_allow_html=True)
+            sagittal_vals = [get_mm(i, 0, 0)[0] for i in range(shape[0])]
+            idx_sagital = st.slider(
+                "", 0, shape[0] - 1, shape[0] // 2,
+                format_func=lambda i: f"{sagittal_vals[i]:.2f} mm",
+                key="sagital",
+                label_visibility="collapsed"
+            )
+            st.markdown("<div style='margin-top:-20px'></div>", unsafe_allow_html=True)
             mostrar_corte(data[idx_sagital, :, :], zoom)
