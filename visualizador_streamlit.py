@@ -3,7 +3,6 @@ import nibabel as nib
 import numpy as np
 import matplotlib.pyplot as plt
 import tempfile
-import streamlit.components.v1 as components
 
 st.set_page_config(layout="wide")
 st.title("🧠 Visualizador tipo 3D Slicer")
@@ -22,21 +21,12 @@ if uploaded_file is not None:
 
     st.success(f"Dimensiones del volumen: {shape}")
 
-    # Estilo personalizado para sliders
-    slider_style = """
+    # Estilo de color por slider
+    st.markdown("""
         <style>
-            div[data-baseweb="slider"] > div {
-                margin-top: -20px;
-            }
-            section[data-testid="stSlider"] label {
-                font-size: 0px;
-            }
-            .axial-slider .stSlider > div > div > div > div { background-color: #c0392b !important; }
-            .coronal-slider .stSlider > div > div > div > div { background-color: #27ae60 !important; }
-            .sagital-slider .stSlider > div > div > div > div { background-color: #2980b9 !important; }
+        .stSlider > div > div > div > div { height: 4px; }
         </style>
-    """
-    st.markdown(slider_style, unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
     # Columnas principales
     col_izq, col_der = st.columns([3, 7])
@@ -71,15 +61,8 @@ if uploaded_file is not None:
         with c1:
             st.markdown('<div style="color:#c0392b; font-size:14px;">🟥 Axial</div>', unsafe_allow_html=True)
             axial_vals = [get_mm(0, 0, i)[2] for i in range(shape[2])]
-            with st.container():
-                st.markdown('<div class="axial-slider">', unsafe_allow_html=True)
-                idx_axial = st.slider(
-                    "", 0, shape[2] - 1, shape[2] // 2,
-                    format_func=lambda i: f"{axial_vals[i]:.2f} mm",
-                    key="axial",
-                    label_visibility="collapsed"
-                )
-                st.markdown('</div>', unsafe_allow_html=True)
+            idx_axial = st.slider("", 0, shape[2] - 1, shape[2] // 2, key="axial")
+            st.markdown(f"<div style='color:#c0392b; font-size:12px;'>Posición: {axial_vals[idx_axial]:.2f} mm</div>", unsafe_allow_html=True)
             mostrar_corte(data[:, :, idx_axial], zoom)
 
         with c2:
@@ -90,27 +73,13 @@ if uploaded_file is not None:
         with c3:
             st.markdown('<div style="color:#27ae60; font-size:14px;">🟩 Coronal</div>', unsafe_allow_html=True)
             coronal_vals = [get_mm(0, i, 0)[1] for i in range(shape[1])]
-            with st.container():
-                st.markdown('<div class="coronal-slider">', unsafe_allow_html=True)
-                idx_coronal = st.slider(
-                    "", 0, shape[1] - 1, shape[1] // 2,
-                    format_func=lambda i: f"{coronal_vals[i]:.2f} mm",
-                    key="coronal",
-                    label_visibility="collapsed"
-                )
-                st.markdown('</div>', unsafe_allow_html=True)
+            idx_coronal = st.slider("", 0, shape[1] - 1, shape[1] // 2, key="coronal")
+            st.markdown(f"<div style='color:#27ae60; font-size:12px;'>Posición: {coronal_vals[idx_coronal]:.2f} mm</div>", unsafe_allow_html=True)
             mostrar_corte(data[:, idx_coronal, :], zoom)
 
         with c4:
             st.markdown('<div style="color:#2980b9; font-size:14px;">🟦 Sagital</div>', unsafe_allow_html=True)
             sagittal_vals = [get_mm(i, 0, 0)[0] for i in range(shape[0])]
-            with st.container():
-                st.markdown('<div class="sagital-slider">', unsafe_allow_html=True)
-                idx_sagital = st.slider(
-                    "", 0, shape[0] - 1, shape[0] // 2,
-                    format_func=lambda i: f"{sagittal_vals[i]:.2f} mm",
-                    key="sagital",
-                    label_visibility="collapsed"
-                )
-                st.markdown('</div>', unsafe_allow_html=True)
+            idx_sagital = st.slider("", 0, shape[0] - 1, shape[0] // 2, key="sagital")
+            st.markdown(f"<div style='color:#2980b9; font-size:12px;'>Posición: {sagittal_vals[idx_sagital]:.2f} mm</div>", unsafe_allow_html=True)
             mostrar_corte(data[idx_sagital, :, :], zoom)
