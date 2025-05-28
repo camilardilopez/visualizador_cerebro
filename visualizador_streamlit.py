@@ -53,7 +53,7 @@ if uploaded_file is not None:
         idx_axial = st.slider(
             "Corte axial (mm)",
             0, shape[2] - 1, shape[2] // 2,
-            format_func=lambda i: format_mm(get_mm(0, 0, i)[2]),
+            format_func=lambda i: format_mm(get_mm(0, 0, int(i))[2]) if i is not None else "",
             key="axial"
         )
         mostrar_corte(data[:, :, idx_axial], zoom)
@@ -69,7 +69,7 @@ if uploaded_file is not None:
         idx_coronal = st.slider(
             "Corte coronal (mm)",
             0, shape[1] - 1, shape[1] // 2,
-            format_func=lambda i: format_mm(get_mm(0, i, 0)[1]),
+            format_func=lambda i: format_mm(get_mm(0, int(i), 0)[1]) if i is not None else "",
             key="coronal"
         )
         mostrar_corte(data[:, idx_coronal, :], zoom)
@@ -79,7 +79,7 @@ if uploaded_file is not None:
         idx_sagital = st.slider(
             "Corte sagital (mm)",
             0, shape[0] - 1, shape[0] // 2,
-            format_func=lambda i: format_mm(get_mm(i, 0, 0)[0]),
+            format_func=lambda i: format_mm(get_mm(int(i), 0, 0)[0]) if i is not None else "",
             key="sagital"
         )
         mostrar_corte(data[idx_sagital, :, :], zoom)
