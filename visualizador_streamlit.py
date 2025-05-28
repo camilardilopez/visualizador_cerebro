@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import tempfile
 
 st.set_page_config(layout="wide")
-st.title("🧠 Visualizador tipo 3D Slicer (optimizado)")
+st.title("🧠 Visualizador tipo 3D Slicer (optimizado y estable)")
 
 uploaded_file = st.file_uploader("Sube un archivo NIfTI (.nii o .nii.gz)", type=["nii", "gz"])
 
@@ -30,9 +30,6 @@ if uploaded_file is not None:
     def get_mm(i, j, k):
         return affine @ np.array([i, j, k, 1])
 
-    def format_mm(mm_val):
-        return f"{mm_val:.2f} mm"
-
     def mostrar_corte(corte, zoom):
         zoom_factor = 1 / zoom
         cx, cy = corte.shape[0] // 2, corte.shape[1] // 2
@@ -50,12 +47,10 @@ if uploaded_file is not None:
 
     with col1:
         st.markdown("### 🟥 Axial")
-        idx_axial = st.slider(
-            "Corte axial (mm)",
-            0, shape[2] - 1, shape[2] // 2,
-            format_func=lambda i: format_mm(get_mm(0, 0, int(i))[2]) if i is not None else "",
-            key="axial"
-        )
+        axial_indices = list(range(shape[2]))
+        axial_labels = [f"{get_mm(0, 0, i)[2]:.2f} mm" for i in axial_indices]
+        idx_axial_label = st.select_slider("Corte axial (mm)", options=axial_labels, value=axial_labels[shape[2] // 2], key="axial")
+        idx_axial = axial_labels.index(idx_axial_label)
         mostrar_corte(data[:, :, idx_axial], zoom)
 
     with col2:
@@ -66,20 +61,16 @@ if uploaded_file is not None:
 
     with col3:
         st.markdown("### 🟩 Coronal")
-        idx_coronal = st.slider(
-            "Corte coronal (mm)",
-            0, shape[1] - 1, shape[1] // 2,
-            format_func=lambda i: format_mm(get_mm(0, int(i), 0)[1]) if i is not None else "",
-            key="coronal"
-        )
+        coronal_indices = list(range(shape[1]))
+        coronal_labels = [f"{get_mm(0, i, 0)[1]:.2f} mm" for i in coronal_indices]
+        idx_coronal_label = st.select_slider("Corte coronal (mm)", options=coronal_labels, value=coronal_labels[shape[1] // 2], key="coronal")
+        idx_coronal = coronal_labels.index(idx_coronal_label)
         mostrar_corte(data[:, idx_coronal, :], zoom)
 
     with col4:
         st.markdown("### 🟦 Sagital")
-        idx_sagital = st.slider(
-            "Corte sagital (mm)",
-            0, shape[0] - 1, shape[0] // 2,
-            format_func=lambda i: format_mm(get_mm(int(i), 0, 0)[0]) if i is not None else "",
-            key="sagital"
-        )
+        sagital_indices = list(range(shape[0]))
+        sagital_labels = [f"{get_mm(i, 0, 0)[0]:.2f} mm" for i in sagital_indices]
+        idx_sagital_label = st.select_slider("Corte sagital (mm)", options=sagital_labels, value=sagital_labels[shape[0] // 2], key="sagital")
+        idx_sagital = sagital_labels.index(idx_sagital_label)
         mostrar_corte(data[idx_sagital, :, :], zoom)
